@@ -1,4 +1,4 @@
-import { getAvailableTimeSlots } from '../calendar.js';
+import { getAvailableTimeSlots, createCalendarEvent } from '../calendar.js';
 import express from 'express'
 
 const router = express.Router();
