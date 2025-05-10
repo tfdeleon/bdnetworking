@@ -29,3 +29,4 @@ dist-ssr
 
 # Google Cloud credentials
 credentials.json
+tokens.json
