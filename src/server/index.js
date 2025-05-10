@@ -1,96 +1,47 @@
 import express from 'express';
 import cors from 'cors';
-import bookingRouter from './api/booking';
-import { createServer } from 'http';
+import dotenv from 'dotenv';
+import fs from 'fs/promises';
+import path from 'path';
+import { oauth2Client } from './calendar.js';
+import bookingRoutes from './api/booking.js';
+
+dotenv.config();
 
 const app = express();
-let port = 3001;
+const port = 3001;
 
-// Configure CORS
-app.use(cors({
-  origin: 'http://localhost:5173',
-  methods: ['POST', 'GET', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Accept'],
-}));
-
-// Middleware
+app.use(cors());
 app.use(express.json());
+app.use('/api', bookingRoutes);
 
-// Request logging middleware
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  next();
+// OAuth login
+app.get('/auth/google', (req, res) => {
+  const url = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: ['https://www.googleapis.com/auth/calendar.events'],
+  });
+  res.redirect(url);
 });
 
-// Health check route
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+// OAuth callback
+app.get('/auth/google/callback', async (req, res) => {
+  const { code } = req.query;
+  try {
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+
+    // Save tokens
+    const tokenPath = path.resolve('./tokens.json');
+    await fs.writeFile(tokenPath, JSON.stringify(tokens, null, 2));
+
+    res.send('✅ Auth successful! You can now book appointments.');
+  } catch (err) {
+    console.error('Error during OAuth callback:', err);
+    res.status(500).send('Authentication failed');
+  }
 });
 
-// Root route
-app.get('/', (req, res) => {
-  res.json({ 
-    message: 'BD Networking API Server',
-    endpoints: {
-      '/': 'API information',
-      '/health': 'Server health check',
-      '/api/create-booking': 'Create a new booking (POST)'
-    }
-  });
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });
-
-// API routes
-app.use('/api', bookingRouter);
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    error: 'Not Found',
-    message: `Cannot ${req.method} ${req.url}`
-  });
-});
-
-// Error handling
-app.use((err, req, res, next) => {
-  console.error('Server error:', err);
-  res.status(500).json({
-    success: false,
-    error: err.message || 'Internal server error'
-  });
-});
-
-function startServer(retryCount = 0) {
-  const server = createServer(app);
-  
-  server.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-  });
-
-  server.on('error', (error) => {
-    if (error.code === 'EADDRINUSE') {
-      console.log(`Port ${port} is in use, trying port ${port + 1}...`);
-      port++;
-      if (retryCount < 3) {
-        startServer(retryCount + 1);
-      } else {
-        console.error('Could not find an available port. Please check running processes.');
-        process.exit(1);
-      }
-    } else {
-      console.error('Server error:', error);
-      process.exit(1);
-    }
-  });
-
-  // Handle graceful shutdown
-  process.on('SIGTERM', () => {
-    server.close(() => {
-      console.log('Server shutting down');
-      process.exit(0);
-    });
-  });
-
-  return server;
-}
-
-startServer();

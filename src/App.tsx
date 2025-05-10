@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import {Instagram, Mail, Shield, Phone, Building2, Bell, Lock, Radio, Settings2, MessageSquare, ChevronRight, Calendar, Camera } from 'lucide-react';
+import {Instagram, Mail, Phone, Building2, Bell, Lock, Radio, Settings2, MessageSquare, ChevronRight, Calendar, Camera } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 
 function BookingForm() {
+  const [availableTimes, setAvailableTimes] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -18,7 +19,7 @@ function BookingForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/create-booking', {
+      const response = await fetch('http://localhost:3001/api/book', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,7 +28,14 @@ function BookingForm() {
         body: JSON.stringify(formData)
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(text || 'Unknown error');
+      }
+
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to create booking');
@@ -60,6 +68,20 @@ function BookingForm() {
       [e.target.id]: e.target.value
     }));
   };
+
+  const handleDateChange = async (e) => {
+  const date = e.target.value;
+  setFormData(prev => ({ ...prev, date }));
+
+  try {
+    const res = await fetch(`http://localhost:3001/api/available-times?date=${date}`);
+    const data = await res.json();
+    setAvailableTimes(data); // expects [{ value, label }]
+  } catch (err) {
+    console.error('Failed to load time slots:', err);
+  }
+};
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -108,36 +130,51 @@ function BookingForm() {
         />
       </div>
       <div>
-        <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
-          Preferred Date
-        </label>
-        <input
-          type="date"
-          id="date"
-          value={formData.date}
-          onChange={handleChange}
-          required
-          min={new Date().toISOString().split('T')[0]}
-          className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent"
-        />
-      </div>
-      <div>
-        <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-1">
-          Preferred Time
-        </label>
-        <select
-          id="time"
-          value={formData.time}
-          onChange={handleChange}
-          required
-          className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent"
-        >
-          <option value="">Select a time</option>
-          <option value="morning">Morning (9AM - 12PM)</option>
-          <option value="afternoon">Afternoon (12PM - 4PM)</option>
-          <option value="evening">Evening (4PM - 7PM)</option>
-        </select>
-      </div>
+  <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
+    Preferred Date
+  </label>
+      <input
+        type="date"
+        id="date"
+        value={formData.date}
+        onChange={async (e) => {
+          const selectedDate = e.target.value;
+          setFormData(prev => ({ ...prev, date: selectedDate }));
+
+          if (!selectedDate) return;
+
+          try {
+            const res = await fetch(`http://localhost:3001/api/available-times?date=${selectedDate}`);
+            const data = await res.json(); // expects [{ value: "13:30", label: "1:30 PM" }, ...]
+            setAvailableTimes(data);
+          } catch (err) {
+            console.error('Failed to load time slots:', err);
+          }
+        }}
+        required
+        min={new Date().toISOString().split('T')[0]}
+        className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent"
+      />
+    </div>
+
+    <div>
+      <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-1">
+        Preferred Time (9:00 AM - 5:00 PM)
+      </label>
+      <select
+        id="time"
+        value={formData.time}
+        onChange={handleChange}
+        required
+        className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-accent"
+      >
+        <option value="">Select a time</option>
+        {availableTimes.map(({ value, label }) => (
+          <option key={value} value={value}>{label}</option>
+        ))}
+      </select>
+    </div>
+
       <div>
         <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
           Additional Notes
@@ -170,7 +207,7 @@ function App() {
       <Toaster position="top-right" />
       {/* Hero Section */}
       <header className="relative bg-primary min-h-screen">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: 'url("https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80")',
@@ -182,9 +219,9 @@ function App() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between py-4">
               <div className="flex items-center">
-                <img 
-                  src="https://i.ibb.co/hBSZWcj/bdnetworkinglogo.jpg" 
-                  alt="BD Networking" 
+                <img
+                  src="https://i.ibb.co/hBSZWcj/bdnetworkinglogo.jpg"
+                  alt="BD Networking"
                   className="h-16"
                 />
               </div>
@@ -200,7 +237,7 @@ function App() {
             </div>
           </div>
         </nav>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20 min-h-screen flex items-center">
           <div className="max-w-3xl">
             <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
@@ -210,13 +247,13 @@ function App() {
               Protecting your property with state-of-the-art security solutions.
             </p>
             <div className="flex flex-wrap gap-4">
-              <a 
+              <a
                 href="#contact"
                 className="bg-accent text-primary px-6 py-3 rounded-md hover:bg-accent-dark flex items-center transition-all duration-200 font-semibold transform hover:scale-105 shadow-lg"
               >
                 Contact Us <ChevronRight className="ml-2 h-5 w-5" />
               </a>
-              <a 
+              <a
                 href="#services"
                 className="border-2 border-accent text-accent px-6 py-3 rounded-md hover:bg-accent hover:text-primary transition-all duration-200 font-semibold transform hover:scale-105"
               >
@@ -236,8 +273,8 @@ function App() {
           <p className="text-lg text-primary/90 mb-6">
             Get a comprehensive security assessment at no cost to you
           </p>
-          <a 
-            href="#booking" 
+          <a
+            href="#booking"
             className="inline-block bg-primary text-accent px-8 py-4 rounded-md hover:bg-gray-900 transition-all duration-200 font-semibold text-lg hover:scale-105 shadow-lg"
           >
             Schedule Your Free Consultation
@@ -252,7 +289,7 @@ function App() {
             <h2 className="text-3xl font-bold text-primary mb-4">Our Services</h2>
             <p className="text-lg text-gray-600">Comprehensive security solutions for your peace of mind</p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
@@ -286,8 +323,8 @@ function App() {
                 description: "Professional security consultation and system design"
               }
             ].map((service, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 hover:scale-105"
               >
                 <div className="mb-4">{service.icon}</div>
@@ -346,13 +383,13 @@ function App() {
                 location: "Local School District"
               }
             ].map((project, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 hover:scale-105"
               >
                 <div className="relative h-64">
-                  <img 
-                    src={project.image} 
+                  <img
+                    src={project.image}
                     alt={project.title}
                     className="w-full h-full object-cover"
                   />
@@ -387,7 +424,7 @@ function App() {
             <div className="text-center mb-8">
               <h3 className="text-xl font-semibold mb-2 text-primary">Free Security Consultation</h3>
               <p className="text-gray-600">
-                Book a time slot for a detailed discussion about your security requirements. 
+                Book a time slot for a detailed discussion about your security requirements.
                 Our expert will contact you to confirm the appointment.
               </p>
             </div>
@@ -447,13 +484,13 @@ function App() {
                 description: "Video intercom systems"
               }
             ].map((brand, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group"
               >
                 <div className="relative h-48">
-                  <img 
-                    src={brand.image} 
+                  <img
+                    src={brand.image}
                     alt={brand.name}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
@@ -498,9 +535,9 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-4 md:mb-0">
-              <img 
-                src="https://i.ibb.co/hBSZWcj/bdnetworkinglogo.jpg" 
-                alt="BD Networking" 
+              <img
+                src="https://i.ibb.co/hBSZWcj/bdnetworkinglogo.jpg"
+                alt="BD Networking"
                 className="h-12"
               />
             </div>
