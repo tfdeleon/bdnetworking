@@ -113,6 +113,14 @@ export async function createCalendarEvent({ name, email, date, time, message, ph
       dateTime: endTimeISO,
       timeZone: 'America/New_York',
     },
+    colorId: "11",
+    reminders: {
+      useDefault: false,
+      overrides: [
+        { method: 'email', minutes: 10 },
+        { method: 'popup', minutes: 10 }
+      ]
+    }
   };
 
   const response = await calendar.events.insert({
