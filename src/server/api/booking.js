@@ -1,21 +1,42 @@
 import { getAvailableTimeSlots, createCalendarEvent } from '../calendar.js';
-import express from 'express'
+import express from 'express';
+import { sendConfirmationEmail } from '../mailer.js';
+import axios from 'axios';
 
 const router = express.Router();
 
+// POST route for booking consultation
 router.post('/book', async (req, res) => {
-  const { name, phone, email, date, time, message } = req.body;
+  const { name, phone, email, date, time, message, recaptchaResponse } = req.body;
 
-  if (!name || !email || !date || !time) {
+  // Validate required fields
+  if (!name || !email || !date || !time || !recaptchaResponse) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
+  // Verify reCAPTCHA
   try {
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY; // Your secret key from Google
+    const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaResponse}`;
+
+    // Verify the reCAPTCHA response by sending a request to Google's API
+    const response = await axios.post(verificationUrl);
+    const { success } = response.data;
+
+    // If reCAPTCHA verification failed
+    if (!success) {
+      return res.status(400).json({ error: 'reCAPTCHA verification failed' });
+    }
+
+    // Proceed with booking logic if reCAPTCHA is valid
     await createCalendarEvent({ name, phone, email, date, time, message });
+    await sendConfirmationEmail({ name, email, date, time });
+
     return res.json({ success: true });
   } catch (err) {
     console.error('❌ Booking error:', err.message);
 
+    // Handle specific errors
     if (err.available) {
       return res.status(409).json({
         error: 'That time slot is already booked.',
@@ -23,10 +44,12 @@ router.post('/book', async (req, res) => {
       });
     }
 
+    // General server error
     return res.status(500).json({ error: err.message || 'Server error' });
   }
 });
 
+// GET route for available times
 router.get('/available-times', async (req, res) => {
   const { date } = req.query;
 
