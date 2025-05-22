@@ -1,6 +1,19 @@
-import { Instagram, Mail, Phone, Building2, Bell, Lock, Radio, Settings2, MessageSquare, ChevronRight, Calendar, Camera } from 'lucide-react';
-import { Toaster } from 'react-hot-toast';
-import BookingForm from './BookingForm';
+import {
+  Instagram,
+  Mail,
+  Phone,
+  Building2,
+  Bell,
+  Lock,
+  Radio,
+  Settings2,
+  MessageSquare,
+  ChevronRight,
+  Calendar,
+  Camera,
+} from "lucide-react";
+import { Toaster } from "react-hot-toast";
+import BookingForm from "./BookingForm";
 function App() {
   return (
     <div className="min-h-screen bg-white">
@@ -10,9 +23,10 @@ function App() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: 'url("https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80")',
-            backgroundBlendMode: 'multiply',
-            backgroundColor: 'rgba(0, 0, 0, 0.85)'
+            backgroundImage:
+              'url("https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80")',
+            backgroundBlendMode: "multiply",
+            backgroundColor: "rgba(0, 0, 0, 0.85)",
           }}
         />
         <nav className="absolute top-0 left-0 right-0 bg-primary/95 backdrop-blur-sm z-50">
@@ -26,10 +40,30 @@ function App() {
                 />
               </div>
               <div className="hidden md:flex items-center space-x-8">
-                <a href="#services" className="text-accent hover:text-accent-dark transition-colors duration-200 font-medium">Services</a>
-                <a href="#portfolio" className="text-accent hover:text-accent-dark transition-colors duration-200 font-medium">Portfolio</a>
-                <a href="#booking" className="text-accent hover:text-accent-dark transition-colors duration-200 font-medium">Book Consultation</a>
-                <a href="#contact" className="text-accent hover:text-accent-dark transition-colors duration-200 font-medium">Contact</a>
+                <a
+                  href="#services"
+                  className="text-accent hover:text-accent-dark transition-colors duration-200 font-medium"
+                >
+                  Services
+                </a>
+                <a
+                  href="#portfolio"
+                  className="text-accent hover:text-accent-dark transition-colors duration-200 font-medium"
+                >
+                  Portfolio
+                </a>
+                <a
+                  href="#booking"
+                  className="text-accent hover:text-accent-dark transition-colors duration-200 font-medium"
+                >
+                  Book Consultation
+                </a>
+                <a
+                  href="#contact"
+                  className="text-accent hover:text-accent-dark transition-colors duration-200 font-medium"
+                >
+                  Contact
+                </a>
                 <button className="bg-accent text-primary px-6 py-2.5 rounded-md hover:bg-accent-dark transition-all duration-200 font-semibold transform hover:scale-105">
                   Get a Quote
                 </button>
@@ -86,8 +120,12 @@ function App() {
       <section id="services" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-primary mb-4">Our Services</h2>
-            <p className="text-lg text-gray-600">Comprehensive security solutions for your peace of mind</p>
+            <h2 className="text-3xl font-bold text-primary mb-4">
+              Our Services
+            </h2>
+            <p className="text-lg text-gray-600">
+              Comprehensive security solutions for your peace of mind
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -95,40 +133,48 @@ function App() {
               {
                 icon: <Building2 className="h-8 w-8 text-accent" />,
                 title: "Intercom Installation",
-                description: "Modern intercom systems for residential and commercial properties"
+                description:
+                  "Modern intercom systems for residential and commercial properties",
               },
               {
                 icon: <Bell className="h-8 w-8 text-accent" />,
                 title: "Alarm Systems",
-                description: "Advanced alarm systems with 24/7 monitoring capabilities"
+                description:
+                  "Advanced alarm systems with 24/7 monitoring capabilities",
               },
               {
                 icon: <Lock className="h-8 w-8 text-accent" />,
                 title: "Access Control",
-                description: "Secure access control systems for enhanced property protection"
+                description:
+                  "Secure access control systems for enhanced property protection",
               },
               {
                 icon: <Radio className="h-8 w-8 text-accent" />,
                 title: "Video Intercom",
-                description: "High-definition video intercom solutions with remote access"
+                description:
+                  "High-definition video intercom solutions with remote access",
               },
               {
                 icon: <Settings2 className="h-8 w-8 text-accent" />,
                 title: "Repair Services",
-                description: "Expert repair and maintenance of security systems"
+                description:
+                  "Expert repair and maintenance of security systems",
               },
               {
                 icon: <MessageSquare className="h-8 w-8 text-accent" />,
                 title: "Consultation",
-                description: "Professional security consultation and system design"
-              }
+                description:
+                  "Professional security consultation and system design",
+              },
             ].map((service, index) => (
               <div
                 key={index}
                 className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 hover:scale-105"
               >
                 <div className="mb-4">{service.icon}</div>
-                <h3 className="text-xl font-semibold mb-2 text-primary">{service.title}</h3>
+                <h3 className="text-xl font-semibold mb-2 text-primary">
+                  {service.title}
+                </h3>
                 <p className="text-gray-600">{service.description}</p>
               </div>
             ))}
@@ -140,48 +186,63 @@ function App() {
       <section id="portfolio" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-primary mb-4">Our Recent Projects</h2>
-            <p className="text-lg text-gray-600">Take a look at some of our successful installations</p>
+            <h2 className="text-3xl font-bold text-primary mb-4">
+              Our Recent Projects
+            </h2>
+            <p className="text-lg text-gray-600">
+              Take a look at some of our successful installations
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                image: "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80",
+                image:
+                  "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80",
                 title: "Commercial Access Control",
-                description: "High-security access control system for a corporate office building",
-                location: "Downtown Business District"
+                description:
+                  "High-security access control system for a corporate office building",
+                location: "Downtown Business District",
               },
               {
-                image: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?auto=format&fit=crop&q=80",
+                image:
+                  "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?auto=format&fit=crop&q=80",
                 title: "Residential Security",
-                description: "Comprehensive home security system with video surveillance",
-                location: "Luxury Residential Complex"
+                description:
+                  "Comprehensive home security system with video surveillance",
+                location: "Luxury Residential Complex",
               },
               {
-                image: "https://images.unsplash.com/photo-1580894894513-541e068a3e2b?auto=format&fit=crop&q=80",
+                image:
+                  "https://images.unsplash.com/photo-1580894894513-541e068a3e2b?auto=format&fit=crop&q=80",
                 title: "Smart Intercom System",
-                description: "Modern video intercom installation for an apartment complex",
-                location: "Urban Apartments"
+                description:
+                  "Modern video intercom installation for an apartment complex",
+                location: "Urban Apartments",
               },
               {
-                image: "https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80",
+                image:
+                  "https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&q=80",
                 title: "Retail Security",
                 description: "Advanced security system for a retail chain",
-                location: "Shopping District"
+                location: "Shopping District",
               },
               {
-                image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80",
+                image:
+                  "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80",
                 title: "Industrial Security",
-                description: "Heavy-duty security solutions for manufacturing facility",
-                location: "Industrial Park"
+                description:
+                  "Heavy-duty security solutions for manufacturing facility",
+                location: "Industrial Park",
               },
               {
-                image: "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?auto=format&fit=crop&q=80",
+                image:
+                  "https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?auto=format&fit=crop&q=80",
                 title: "Network Infrastructure",
-                description: "Complete security infrastructure for educational institution",
-                location: "Local School District"
-              }
+                description:
+                  "Complete security infrastructure for educational institution",
+                location: "Local School District",
+              },
             ].map((project, index) => (
               <div
                 key={index}
@@ -196,7 +257,9 @@ function App() {
                   <div className="absolute inset-0 bg-black bg-opacity-20 hover:bg-opacity-10 transition-opacity duration-300" />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-2 text-primary">{project.title}</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-primary">
+                    {project.title}
+                  </h3>
                   <p className="text-gray-600 mb-2">{project.description}</p>
                   <div className="flex items-center text-sm text-accent">
                     <Camera className="h-4 w-4 mr-1" />
@@ -213,8 +276,12 @@ function App() {
       <section id="booking" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-primary mb-4">Book a Consultation</h2>
-            <p className="text-lg text-gray-600">Schedule a free consultation to discuss your security needs</p>
+            <h2 className="text-3xl font-bold text-primary mb-4">
+              Book a Consultation
+            </h2>
+            <p className="text-lg text-gray-600">
+              Schedule a free consultation to discuss your security needs
+            </p>
           </div>
 
           <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8 border border-gray-100">
@@ -222,10 +289,13 @@ function App() {
               <Calendar className="h-12 w-12 text-accent" />
             </div>
             <div className="text-center mb-8">
-              <h3 className="text-xl font-semibold mb-2 text-primary">Free Security Consultation</h3>
+              <h3 className="text-xl font-semibold mb-2 text-primary">
+                Free Security Consultation
+              </h3>
               <p className="text-gray-600">
-                Book a time slot for a detailed discussion about your security requirements.
-                Our expert will contact you to confirm the appointment.
+                Book a time slot for a detailed discussion about your security
+                requirements. Our expert will contact you to confirm the
+                appointment.
               </p>
             </div>
             <BookingForm />
@@ -237,8 +307,13 @@ function App() {
       <section id="contact" className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-primary mb-4">Trusted Brands We Work With</h2>
-            <p className="text-lg text-gray-600">We partner with industry-leading security brands to provide the best solutions</p>
+            <h2 className="text-3xl font-bold text-primary mb-4">
+              Trusted Brands We Work With
+            </h2>
+            <p className="text-lg text-gray-600">
+              We partner with industry-leading security brands to provide the
+              best solutions
+            </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -246,43 +321,44 @@ function App() {
               {
                 name: "AIPHONE",
                 image: "https://i.ibb.co/mynZFtR/aiphonelogo.webp",
-                description: "Professional surveillance solutions"
+                description: "Professional surveillance solutions",
               },
               {
                 name: "ButterflyMX",
                 image: "https://i.ibb.co/88Z6nvT/Butterflymxlogo.jpg",
-                description: "Advanced security systems"
+                description: "Advanced security systems",
               },
               {
                 name: "2N",
                 image: "https://i.ibb.co/jHmd2X4/2-N-Logo-png.webp",
-                description: "Network video solutions"
+                description: "Network video solutions",
               },
               {
                 name: "DoorBird",
                 image: "https://i.ibb.co/8Db7LBC/idc3d-XIWk.webp",
-                description: "Integrated security systems"
+                description: "Integrated security systems",
               },
               {
                 name: "Akuvox",
                 image: "https://i.ibb.co/LJVDDzH/image.webp",
-                description: "Security and safety systems"
+                description: "Security and safety systems",
               },
               {
                 name: "InVid",
                 image: "https://i.ibb.co/TYmZbRs/invid.webp",
-                description: "IP intercoms and access systems"
+                description: "IP intercoms and access systems",
               },
               {
                 name: "HIKVISION",
                 image: "https://i.ibb.co/W0TkY0T/HIKVISONLOGO.webp",
-                description: "Smart video intercoms"
+                description: "Smart video intercoms",
               },
               {
                 name: "Eagle Eye Networks",
-                image: "https://i.ibb.co/BZ9vLyR/Eagle-Eye-New-Logo-Light-Blue-SVG.webp",
-                description: "Video intercom systems"
-              }
+                image:
+                  "https://i.ibb.co/BZ9vLyR/Eagle-Eye-New-Logo-Light-Blue-SVG.webp",
+                description: "Video intercom systems",
+              },
             ].map((brand, index) => (
               <div
                 key={index}
@@ -301,7 +377,9 @@ function App() {
                   </div>
                 </div>
                 <div className="p-4 text-center">
-                  <h3 className="text-lg font-semibold text-primary">{brand.name}</h3>
+                  <h3 className="text-lg font-semibold text-primary">
+                    {brand.name}
+                  </h3>
                 </div>
               </div>
             ))}
@@ -315,13 +393,19 @@ function App() {
               </div>
               <div className="flex items-center space-x-2">
                 <Instagram className="h-6 w-6 text-accent" />
-                <a href="https://instagram.com/bdnetworking/" className="text-gray-700 hover:text-accent transition-colors">
+                <a
+                  href="https://instagram.com/bdnetworking/"
+                  className="text-gray-700 hover:text-accent transition-colors"
+                >
                   bdnetworking
                 </a>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="h-6 w-6 text-accent" />
-                <a href="mailto:bdlvsolutions@gmail.com" className="text-gray-700 hover:text-accent transition-colors">
+                <a
+                  href="mailto:bdlvsolutions@gmail.com"
+                  className="text-gray-700 hover:text-accent transition-colors"
+                >
                   bdlvsolutions@gmail.com
                 </a>
               </div>
@@ -342,8 +426,12 @@ function App() {
               />
             </div>
             <div className="text-center md:text-right">
-              <p className="text-accent">© 2024 BD Networking. All rights reserved.</p>
-              <p className="text-gray-400">Professional Security Installation Services</p>
+              <p className="text-accent">
+                © 2024 BD Networking. All rights reserved.
+              </p>
+              <p className="text-gray-400">
+                Professional Security Installation Services
+              </p>
             </div>
           </div>
         </div>

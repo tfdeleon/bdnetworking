@@ -1,17 +1,19 @@
-import { getAvailableTimeSlots, createCalendarEvent } from '../calendar.js';
-import express from 'express';
-import { sendConfirmationEmail } from '../mailer.js';
-import axios from 'axios';
+import { createCalendarEvent } from "../calendar.js"; // Ensure correct import
+import express from "express";
+import { sendConfirmationEmail } from "../mailer.js";
+import axios from "axios";
+import { getAvailableTimeSlots } from "../calendar.js"; // You also have this import here
 
 const router = express.Router();
 
 // POST route for booking consultation
-router.post('/book', async (req, res) => {
-  const { name, phone, email, date, time, message, recaptchaResponse } = req.body;
+router.post("/book", async (req, res) => {
+  const { name, phone, email, date, time, message, recaptchaResponse } =
+    req.body;
 
   // Validate required fields
   if (!name || !email || !date || !time || !recaptchaResponse) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    return res.status(400).json({ error: "Missing required fields" });
   }
 
   // Verify reCAPTCHA
@@ -25,7 +27,7 @@ router.post('/book', async (req, res) => {
 
     // If reCAPTCHA verification failed
     if (!success) {
-      return res.status(400).json({ error: 'reCAPTCHA verification failed' });
+      return res.status(400).json({ error: "reCAPTCHA verification failed" });
     }
 
     // Proceed with booking logic if reCAPTCHA is valid
@@ -34,33 +36,38 @@ router.post('/book', async (req, res) => {
 
     return res.json({ success: true });
   } catch (err) {
-    console.error('❌ Booking error:', err.message);
+    console.error("❌ Booking error:", err.message);
 
     // Handle specific errors
     if (err.available) {
       return res.status(409).json({
-        error: 'That time slot is already booked.',
+        error: "That time slot is already booked.",
         availableTimes: err.available,
       });
     }
 
     // General server error
-    return res.status(500).json({ error: err.message || 'Server error' });
+    return res.status(500).json({ error: err.message || "Server error" });
   }
 });
 
 // GET route for available times
-router.get('/available-times', async (req, res) => {
+router.get("/available-times", async (req, res) => {
   const { date } = req.query;
 
-  if (!date) return res.status(400).json({ error: 'Date is required' });
+  if (!date) {
+    return res.status(400).json({ error: "Date is required" });
+  }
 
   try {
-    const slots = await getAvailableTimeSlots(date);
-    res.json(slots); // [{ value: '09:00', label: '9:00 AM' }, ...]
+    // Get the available and booked times from Google Calendar for the given date
+    const { availableTimes, bookedTimes } = await getAvailableTimeSlots(date);
+
+    // Send both available and booked times in the response
+    res.json({ availableTimes, bookedTimes });
   } catch (err) {
-    console.error('Error getting available times:', err);
-    res.status(500).json({ error: 'Failed to fetch available times' });
+    console.error("Error getting available times:", err);
+    res.status(500).json({ error: "Failed to fetch available times" });
   }
 });
 
