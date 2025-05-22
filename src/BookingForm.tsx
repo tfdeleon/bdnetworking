@@ -288,6 +288,7 @@ function BookingForm() {
         sitekey="6LdnJTYrAAAAAApOIdmeBs9sefavj8xEDVLYxfYY"
         onChange={handleRecaptchaChange}
       />
+
       <button
         type="submit"
         disabled={isSubmitting}
