@@ -45,7 +45,7 @@ function BookingForm() {
 
     try {
       const res = await fetch(
-        `https://bdlvsolutions.com/api/available-times?date=${date}`,
+        `https://www.bdlvsolutions.com/api/available-times?date=${date}`,
       );
       const data = await res.json();
 
@@ -116,7 +116,7 @@ function BookingForm() {
     }
 
     try {
-      const response = await fetch("https://bdlvsolutions.com/api/book", {
+      const response = await fetch("https://www.bdlvsolutions.com/api/book", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
