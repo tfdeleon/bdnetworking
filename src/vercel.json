@@ -8,8 +8,16 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "src/server/api/$1"
+      "src": "/api/available-times",
+      "dest": "src/server/api/available-times.js"
+    },
+    {
+      "src": "/api/book",
+      "dest": "src/server/api/book.js"
+    },
+    {
+      "src": "/api/verify-recaptcha",
+      "dest": "src/server/api/verify-recaptcha.js"
     }
   ]
 }
