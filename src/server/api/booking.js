@@ -5,21 +5,16 @@ import { sendConfirmationEmail } from "../mailer.js";
 
 const router = express.Router();
 
-// ✅ CORS middleware (required if frontend is hosted on another domain, like GitHub Pages)
-router.use((req, res, next) => {
+// ✅ POST /book - Handles booking
+router.post("/book", async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "https://www.bdlvsolutions.com");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
-    return res.status(200).end(); // Preflight request
+    return res.status(200).end();
   }
 
-  next();
-});
-
-// ✅ POST /book - Handles booking
-router.post("/book", async (req, res) => {
   const { name, phone, email, date, time, message, recaptchaResponse } = req.body;
 
   if (!name || !email || !date || !time || !recaptchaResponse) {
@@ -27,7 +22,6 @@ router.post("/book", async (req, res) => {
   }
 
   try {
-    // ✅ Verify reCAPTCHA
     const secretKey = process.env.RECAPTCHA_SECRET_KEY;
     const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaResponse}`;
 
@@ -38,7 +32,6 @@ router.post("/book", async (req, res) => {
       return res.status(400).json({ error: "reCAPTCHA verification failed" });
     }
 
-    // ✅ Proceed to book and send confirmation
     await createCalendarEvent({ name, phone, email, date, time, message });
     await sendConfirmationEmail({ name, email, date, time });
 
@@ -59,6 +52,14 @@ router.post("/book", async (req, res) => {
 
 // ✅ GET /available-times - Fetches slots for a given date
 router.get("/available-times", async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://www.bdlvsolutions.com");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   const { date } = req.query;
 
   if (!date) {
