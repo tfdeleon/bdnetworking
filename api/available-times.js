@@ -1,4 +1,4 @@
-import { getAvailableTimeSlots } from "../calendar.js";
+import { getAvailableTimeSlots } from "../src/server/calendar.js";
 
 export default async function handler(req, res) {
 

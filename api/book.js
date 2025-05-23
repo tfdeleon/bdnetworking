@@ -1,6 +1,6 @@
 import axios from "axios";
-import { createCalendarEvent, getAvailableTimeSlots } from "../calendar.js";
-import { sendConfirmationEmail } from "../mailer.js";
+import { createCalendarEvent, getAvailableTimeSlots } from "../src/server/calendar.js";
+import { sendConfirmationEmail } from "../src/server/mailer.js";
 
 export default async function handler(req, res) {
   // ✅ CORS headers

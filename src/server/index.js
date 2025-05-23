@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import fs from "fs/promises";
 import path from "path";
 import { oauth2Client } from "./calendar.js";
-import bookingRoutes from "./api/booking.js";
+import bookingRoutes from "../../api/book.js";
 
 dotenv.config();
 
