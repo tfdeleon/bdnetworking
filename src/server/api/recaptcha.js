@@ -6,7 +6,7 @@ const router = express.Router();
 // Route to verify reCAPTCHA
 router.post("/verify-recaptcha", async (req, res) => {
   const { recaptchaResponse } = req.body;
-  console.log('Received reCAPTCHA Token:', recaptchaResponse);
+  console.log("Received reCAPTCHA Token:", recaptchaResponse);
 
   // Check if the reCAPTCHA response is present
   if (!recaptchaResponse) {
@@ -22,7 +22,7 @@ router.post("/verify-recaptcha", async (req, res) => {
     const response = await axios.post(verificationUrl);
 
     // Check if the verification was successful
-    const { success, 'error-codes': errorCodes } = response.data;
+    const { success, "error-codes": errorCodes } = response.data;
 
     if (!success) {
       return res.status(400).json({

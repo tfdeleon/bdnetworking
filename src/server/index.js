@@ -12,15 +12,17 @@ const app = express();
 const port = 3001;
 
 // Allowing CORS for specific frontend (you can modify the origin if needed)
-const allowedOrigins = ['http://localhost:5173'];  // Adjust this to your frontend's address
-app.use(cors({
-  origin: allowedOrigins,
-  methods: 'GET,POST',
-  allowedHeaders: 'Content-Type,Authorization',
-}));
+const allowedOrigins = ["http://localhost:5173"]; // Adjust this to your frontend's address
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: "GET,POST",
+    allowedHeaders: "Content-Type,Authorization",
+  }),
+);
 
 app.use(express.json());
-app.use("/api", bookingRoutes);  // Your existing routes for booking
+app.use("/api", bookingRoutes); // Your existing routes for booking
 
 // OAuth login route
 app.get("/auth/google", (req, res) => {

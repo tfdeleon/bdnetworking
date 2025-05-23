@@ -19,7 +19,7 @@ interface TimeSlot {
 
 function BookingForm() {
   // Set initial state types
-  const [availableTimes, setAvailableTimes] = useState<TimeSlot[]>([]);  // This is the key state
+  const [availableTimes, setAvailableTimes] = useState<TimeSlot[]>([]); // This is the key state
   const [bookedTimes, setBookedTimes] = useState<string[]>([]);
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -44,16 +44,31 @@ function BookingForm() {
     setFormData((prev) => ({ ...prev, date }));
 
     try {
-      const res = await fetch(`http://localhost:3001/api/available-times?date=${date}`);
+      const res = await fetch(
+        `http://localhost:3001/api/available-times?date=${date}`,
+      );
       const data = await res.json();
 
       console.log("Fetched Data:", data);
 
       // Predefined time slots (24-hour format)
       const timeSlots = [
-        "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-        "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
-        "15:00", "15:30", "16:00", "16:30"
+        "09:00",
+        "09:30",
+        "10:00",
+        "10:30",
+        "11:00",
+        "11:30",
+        "12:00",
+        "12:30",
+        "13:00",
+        "13:30",
+        "14:00",
+        "14:30",
+        "15:00",
+        "15:30",
+        "16:00",
+        "16:30",
       ];
 
       if (data?.bookedTimes) {
@@ -61,7 +76,7 @@ function BookingForm() {
 
         // Filter out booked times from the predefined time slots
         const filteredAvailableTimes = timeSlots.filter(
-          (slot) => !bookedTimes.includes(slot)
+          (slot) => !bookedTimes.includes(slot),
         );
 
         // Convert to 12-hour format for display
@@ -85,7 +100,7 @@ function BookingForm() {
   // Function to format time in 12-hour format (e.g., "9:00 AM")
   function formatTo12Hour(time: string) {
     const [hours, minutes] = time.split(":");
-    const formattedHours = (parseInt(hours, 10) % 12) || 12; // Convert 24-hour to 12-hour format
+    const formattedHours = parseInt(hours, 10) % 12 || 12; // Convert 24-hour to 12-hour format
     const ampm = parseInt(hours, 10) < 12 ? "AM" : "PM";
     return `${formattedHours}:${minutes} ${ampm}`;
   }
@@ -150,7 +165,11 @@ function BookingForm() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.id]: e.target.value,
