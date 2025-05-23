@@ -12,7 +12,7 @@ async function initOAuth() {
   oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
+    process.env.GOOGLE_REDIRECT_URI,
   );
 
   try {
@@ -91,14 +91,16 @@ export async function createCalendarEvent({
     throw new Error("Selected time is outside of working hours (9AM–5PM).");
   }
 
-  const startTime = `${date}T${time}:00`;
-  const endTime = new Date(startTime);
-  endTime.setHours(endTime.getHours() + 1);
+  const startDateTime = new Date(`${date}T${time}:00-04:00`); // Adjust timezone offset as needed
+  const endDateTime = new Date(startDateTime.getTime() + 30 * 60 * 1000); // 30 minutes later
+
+  const startTimeISO = startDateTime.toISOString();
+  const endTimeISO = endDateTime.toISOString();
 
   const events = await calendar.events.list({
     calendarId: "primary",
-    timeMin: new Date(startTime).toISOString(),
-    timeMax: endTime.toISOString(),
+    timeMin: startTimeISO,
+    timeMax: endTimeISO,
     singleEvents: true,
     orderBy: "startTime",
   });
@@ -114,11 +116,11 @@ export async function createCalendarEvent({
     summary: `Consultation with ${name}`,
     description: `Email: ${email}\nPhone: ${phone}\nMessage: ${message}`,
     start: {
-      dateTime: startTime,
+      dateTime: startTimeISO,
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: endTime.toISOString(),
+      dateTime: endTimeISO,
       timeZone: "America/New_York",
     },
     colorId: "11",

@@ -10,7 +10,7 @@ export async function sendConfirmationEmail({ name, email, date, time }) {
   });
 
   const mailOptions = {
-    from: `"${process.env.CONFIRMATION_FROM_NAME || 'Bdlvsolutions'}" <${process.env.CONFIRMATION_EMAIL}>`,
+    from: `"${process.env.CONFIRMATION_FROM_NAME || "Bdlvsolutions"}" <${process.env.CONFIRMATION_EMAIL}>`,
     to: email,
     subject: "Your Consultation is Confirmed",
     html: `

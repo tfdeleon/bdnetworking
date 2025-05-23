@@ -1,5 +1,8 @@
 import axios from "axios";
-import { createCalendarEvent, getAvailableTimeSlots } from "../src/server/calendar.js";
+import {
+  createCalendarEvent,
+  getAvailableTimeSlots,
+} from "../src/server/calendar.js";
 import { sendConfirmationEmail } from "../src/server/mailer.js";
 
 export default async function handler(req, res) {
@@ -19,7 +22,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { name, phone, email, date, time, message, recaptchaResponse } = req.body;
+  const { name, phone, email, date, time, message, recaptchaResponse } =
+    req.body;
 
   if (!name || !email || !date || !time || !recaptchaResponse) {
     return res.status(400).json({ error: "Missing required fields" });

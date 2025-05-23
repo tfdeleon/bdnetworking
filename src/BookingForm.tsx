@@ -35,7 +35,6 @@ function BookingForm() {
   // Handle reCAPTCHA response
   const handleRecaptchaChange = (value: string | null) => {
     setRecaptchaValue(value);
-    console.log("reCAPTCHA Token:", value);
   };
 
   // Fetch available and booked times when date changes
