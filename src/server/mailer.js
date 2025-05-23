@@ -1,6 +1,4 @@
 import nodemailer from "nodemailer";
-import dotenv from "dotenv";
-dotenv.config();
 
 export async function sendConfirmationEmail({ name, email, date, time }) {
   const transporter = nodemailer.createTransport({
@@ -12,7 +10,7 @@ export async function sendConfirmationEmail({ name, email, date, time }) {
   });
 
   const mailOptions = {
-    from: `"Bdlvsolutions" <${process.env.CONFIRMATION_EMAIL}>`,
+    from: `"${process.env.CONFIRMATION_FROM_NAME || 'Bdlvsolutions'}" <${process.env.CONFIRMATION_EMAIL}>`,
     to: email,
     subject: "Your Consultation is Confirmed",
     html: `
@@ -47,13 +45,9 @@ export async function sendConfirmationEmail({ name, email, date, time }) {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log(
-      "📧 Confirmation email sent to:",
-      email,
-      "| Message ID:",
-      info.messageId,
-    );
+    console.log("📧 Confirmation email sent:", info.messageId);
   } catch (error) {
-    console.error("❌ Failed to send confirmation email:", error.message);
+    console.error("❌ Failed to send email:", error.message);
+    throw new Error("Email delivery failed");
   }
 }

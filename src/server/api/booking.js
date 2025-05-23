@@ -1,36 +1,44 @@
-import { createCalendarEvent } from "../calendar.js"; // Ensure correct import
 import express from "express";
-import { sendConfirmationEmail } from "../mailer.js";
 import axios from "axios";
-import { getAvailableTimeSlots } from "../calendar.js"; // You also have this import here
+import { createCalendarEvent, getAvailableTimeSlots } from "../calendar.js";
+import { sendConfirmationEmail } from "../mailer.js";
 
 const router = express.Router();
 
-// POST route for booking consultation
-router.post("/book", async (req, res) => {
-  const { name, phone, email, date, time, message, recaptchaResponse } =
-    req.body;
+// ✅ CORS middleware (required if frontend is hosted on another domain, like GitHub Pages)
+router.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://www.bdlvsolutions.com");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Validate required fields
+  if (req.method === "OPTIONS") {
+    return res.status(200).end(); // Preflight request
+  }
+
+  next();
+});
+
+// ✅ POST /book - Handles booking
+router.post("/book", async (req, res) => {
+  const { name, phone, email, date, time, message, recaptchaResponse } = req.body;
+
   if (!name || !email || !date || !time || !recaptchaResponse) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  // Verify reCAPTCHA
   try {
-    const secretKey = process.env.RECAPTCHA_SECRET_KEY; // Your secret key from Google
+    // ✅ Verify reCAPTCHA
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
     const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaResponse}`;
 
-    // Verify the reCAPTCHA response by sending a request to Google's API
     const response = await axios.post(verificationUrl);
     const { success } = response.data;
 
-    // If reCAPTCHA verification failed
     if (!success) {
       return res.status(400).json({ error: "reCAPTCHA verification failed" });
     }
 
-    // Proceed with booking logic if reCAPTCHA is valid
+    // ✅ Proceed to book and send confirmation
     await createCalendarEvent({ name, phone, email, date, time, message });
     await sendConfirmationEmail({ name, email, date, time });
 
@@ -38,7 +46,6 @@ router.post("/book", async (req, res) => {
   } catch (err) {
     console.error("❌ Booking error:", err.message);
 
-    // Handle specific errors
     if (err.available) {
       return res.status(409).json({
         error: "That time slot is already booked.",
@@ -46,12 +53,11 @@ router.post("/book", async (req, res) => {
       });
     }
 
-    // General server error
     return res.status(500).json({ error: err.message || "Server error" });
   }
 });
 
-// GET route for available times
+// ✅ GET /available-times - Fetches slots for a given date
 router.get("/available-times", async (req, res) => {
   const { date } = req.query;
 
@@ -60,10 +66,7 @@ router.get("/available-times", async (req, res) => {
   }
 
   try {
-    // Get the available and booked times from Google Calendar for the given date
     const { availableTimes, bookedTimes } = await getAvailableTimeSlots(date);
-
-    // Send both available and booked times in the response
     res.json({ availableTimes, bookedTimes });
   } catch (err) {
     console.error("Error getting available times:", err);

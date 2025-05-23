@@ -1,28 +1,42 @@
 import { google } from "googleapis";
-import fs from "fs/promises";
-import path from "path";
 import dotenv from "dotenv";
 dotenv.config();
 
-export const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI,
-);
+let oauth2Client;
+let initialized = false;
 
-// Load saved credentials from disk
-const tokenPath = path.resolve("./tokens.json");
-try {
-  const tokenJSON = await fs.readFile(tokenPath, "utf-8");
-  const tokens = JSON.parse(tokenJSON);
-  oauth2Client.setCredentials(tokens);
-  console.log("✅ Loaded saved Google tokens");
-} catch {
-  console.warn("⚠️ No saved tokens. Visit /auth/google to authenticate.");
+// Initialize and authenticate the OAuth2 client
+async function initOAuth() {
+  if (initialized) return;
+
+  oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI
+  );
+
+  try {
+    const tokens = JSON.parse(process.env.GOOGLE_TOKENS);
+    oauth2Client.setCredentials(tokens);
+    initialized = true;
+    console.log("✅ Loaded Google tokens from environment variable.");
+  } catch (err) {
+    console.error("❌ Failed to load Google tokens:", err.message);
+    throw new Error("Missing or invalid GOOGLE_TOKENS environment variable.");
+  }
 }
 
-// Function to get available time slots
+// Format time as 12-hour string
+function formatTo12Hour(time) {
+  const [hours, minutes] = time.split(":");
+  const formattedHours = hours % 12 || 12;
+  const ampm = hours < 12 ? "AM" : "PM";
+  return `${formattedHours}:${minutes} ${ampm}`;
+}
+
+// Get available time slots for a given date
 export async function getAvailableTimeSlots(date) {
+  await initOAuth();
   const calendar = google.calendar({ version: "v3", auth: oauth2Client });
 
   const startOfDay = new Date(`${date}T09:00:00`);
@@ -42,38 +56,26 @@ export async function getAvailableTimeSlots(date) {
     throw err;
   }
 
-  // Create a set of booked times
   const bookedTimes = events.data.items.map((event) => {
     const startTime = new Date(event.start.dateTime);
-    return startTime.toISOString().slice(11, 16); // Return the time in HH:mm format
+    return startTime.toISOString().slice(11, 16);
   });
 
   const allSlots = [];
   const current = new Date(startOfDay);
 
-  // Loop to create slots in 30-minute intervals
   while (current < endOfDay) {
     const hours = current.getHours().toString().padStart(2, "0");
     const minutes = current.getMinutes().toString().padStart(2, "0");
     const value = `${hours}:${minutes}`;
-
     allSlots.push({ value, label: formatTo12Hour(value) });
-
-    current.setMinutes(current.getMinutes() + 30); // Move to next time slot
+    current.setMinutes(current.getMinutes() + 30);
   }
 
   return { availableTimes: allSlots, bookedTimes };
 }
 
-// Helper function to format time in 12-hour format (e.g., "9:00 AM")
-function formatTo12Hour(time) {
-  const [hours, minutes] = time.split(":");
-  const formattedHours = hours % 12 || 12; // Convert 24-hour to 12-hour format
-  const ampm = hours < 12 ? "AM" : "PM";
-  return `${formattedHours}:${minutes} ${ampm}`;
-}
-
-// Create calendar event function
+// Create a new calendar event
 export async function createCalendarEvent({
   name,
   email,
@@ -82,9 +84,9 @@ export async function createCalendarEvent({
   message,
   phone,
 }) {
+  await initOAuth();
   const calendar = google.calendar({ version: "v3", auth: oauth2Client });
 
-  // Ensure time is within working hours (9 AM – 5 PM)
   if (time < "09:00" || time >= "17:00") {
     throw new Error("Selected time is outside of working hours (9AM–5PM).");
   }
@@ -93,17 +95,14 @@ export async function createCalendarEvent({
   const endTime = new Date(startTime);
   endTime.setHours(endTime.getHours() + 1);
 
-  const endTimeISO = endTime.toISOString();
-
   const events = await calendar.events.list({
     calendarId: "primary",
     timeMin: new Date(startTime).toISOString(),
-    timeMax: endTimeISO,
+    timeMax: endTime.toISOString(),
     singleEvents: true,
     orderBy: "startTime",
   });
 
-  // Check if the time slot is already booked
   if (events.data.items.length > 0) {
     const available = await getAvailableTimeSlots(date);
     const error = new Error("Time slot already booked");
@@ -119,7 +118,7 @@ export async function createCalendarEvent({
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: endTimeISO,
+      dateTime: endTime.toISOString(),
       timeZone: "America/New_York",
     },
     colorId: "11",

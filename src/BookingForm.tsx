@@ -45,7 +45,7 @@ function BookingForm() {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/api/available-times?date=${date}`,
+        `https://bdlvsolutions.vercel.app/api/available-times?date=${date}`,
       );
       const data = await res.json();
 
@@ -116,7 +116,7 @@ function BookingForm() {
     }
 
     try {
-      const response = await fetch("http://localhost:3001/api/book", {
+      const response = await fetch("https://bdlvsolutions.vercel.app/api/book", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
